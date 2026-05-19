@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --background: #07070a;
+  --foreground: #f4f4f7;
+  
+  --neon-rose: 244 63 94;
+  --neon-violet: 139 92 246;
+  --neon-cyan: 6 182 212;
+  --neon-amber: 245 158 11;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), "Outfit", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+/* Base structural overrides */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Elegant glowing scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 15, 25, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 99px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 63, 94, 0.6);
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+}
+
+/* Glowing Neon Utilities */
+.neon-glow-rose {
+  box-shadow: 0 0 20px rgba(var(--neon-rose), 0.15), 0 0 40px rgba(var(--neon-rose), 0.05);
+}
+
+.neon-glow-violet {
+  box-shadow: 0 0 20px rgba(var(--neon-violet), 0.15), 0 0 40px rgba(var(--neon-violet), 0.05);
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 20px rgba(var(--neon-cyan), 0.15), 0 0 40px rgba(var(--neon-cyan), 0.05);
+}
+
+.neon-border-rose:hover {
+  border-color: rgba(var(--neon-rose), 0.6);
+  box-shadow: 0 0 15px rgba(var(--neon-rose), 0.25);
+}
+
+.neon-border-violet:hover {
+  border-color: rgba(var(--neon-violet), 0.6);
+  box-shadow: 0 0 15px rgba(var(--neon-violet), 0.25);
+}
+
+.neon-border-cyan:hover {
+  border-color: rgba(var(--neon-cyan), 0.6);
+  box-shadow: 0 0 15px rgba(var(--neon-cyan), 0.25);
+}
+
+/* Keyframes for soft typing animation */
+@keyframes typingPulse {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  animation: typingPulse 1.2s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Cyberpunk Mesh Grid Background */
+.cyber-bg {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
+}
+
+.cyber-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
