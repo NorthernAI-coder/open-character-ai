@@ -112,7 +112,12 @@ export async function POST(req, { params }) {
       historyBlock = `\n\n### RECENT CONVERSATION HISTORY ###\n${formattedHistory}\n\n`;
     }
 
-    const enhancedSystemPrompt = `${chat.character.systemPrompt}${historyBlock}IMPORTANT: Reply to the USER's latest message naturally based on the above recent conversation history. Do not repeat the history.`;
+    const enhancedSystemPrompt = `${chat.character.systemPrompt}${historyBlock}
+IMPORTANT:
+- Reply to the USER's latest message naturally based on the above recent conversation history.
+- Do not repeat the history.
+- You are roleplaying as ${chat.character.name}. Write your response directly in first-person as ${chat.character.name}.
+- Do NOT start your response with "User: ...", "${chat.character.name}: ...", or similar labels. Just output the dialogue itself.`;
 
     // 3. Deduct credits first (Transaction protection)
     await prisma.user.update({

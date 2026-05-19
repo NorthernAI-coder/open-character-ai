@@ -696,15 +696,19 @@ export default function ChatConsole({ params }) {
               {/* TYPING LOADER STATUS */}
               {isTyping && (
                 <div className="flex items-start gap-4 self-start">
-                  <div className="h-9 w-9 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/50 flex items-center justify-center font-bold text-sm">
-                    {activeChat?.character.avatar || "🤖"}
+                  <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center">
+                    {activeChat?.character?.profileUrl || (activeChat?.character?.avatar?.length > 2 && activeChat?.character?.avatar?.startsWith('http')) ? (
+                      <img src={activeChat?.character?.profileUrl || activeChat?.character?.avatar} alt="avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      activeChat?.character?.avatar || "🤖"
+                    )}
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1 text-[10px] text-zinc-500">
                       <span className="font-extrabold uppercase tracking-wide">
                         {activeChat?.character.name || "AI"}
                       </span>
-                      <span>is synchronizing response...</span>
+                      <span>is typing...</span>
                     </div>
                     <div className="bg-zinc-900/40 border border-zinc-800/50 rounded rounded-tl-none p-4 flex gap-1.5 items-center justify-center h-10 w-16">
                       <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '0ms' }} />
