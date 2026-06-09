@@ -1,114 +1,148 @@
 @import "tailwindcss";
 
-:root {
-  --background: #07070a;
-  --foreground: #f4f4f7;
+@theme {
+  --font-sans: var(--font-inter), sans-serif;
+  --font-outfit: var(--font-inter), sans-serif;
   
-  --neon-rose: 244 63 94;
-  --neon-violet: 139 92 246;
-  --neon-cyan: 6 182 212;
-  --neon-amber: 245 158 11;
+  --color-bg-page: var(--bg-page, #09090b);
+  --color-bg-card: var(--bg-card, #18181b);
+  --color-bg-card-hover: var(--bg-card-hover, #27272a);
+  --color-bg-elevated: var(--bg-elevated, #202024);
+  --color-divider: var(--divider, #3f3f46);
+  --color-primary: var(--primary, #8b5cf6);
+  --color-primary-hover: var(--primary-hover, #7c3aed);
+  --color-primary-text: var(--primary-text, #f4f4f5);
+  --color-secondary-text: var(--secondary-text, #a1a1aa);
+  --color-primary-btn-text: var(--primary-btn-text, #ffffff);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), "Outfit", system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+/* Premium Visual Themes Override Definitions */
+[data-theme="cyberpunk"] {
+  --bg-page: #05010a;
+  --bg-card: #0e051c;
+  --bg-card-hover: #1b0c32;
+  --bg-elevated: #150827;
+  --divider: #ec4899;
+  --primary: #f43f5e;
+  --primary-hover: #e11d48;
+  --primary-text: #fff1f2;
+  --secondary-text: #06b6d4;
+  --primary-btn-text: #ffffff;
 }
 
-/* Base structural overrides */
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
-  overflow-x: hidden;
+[data-theme="emerald"] {
+  --bg-page: #022c22;
+  --bg-card: #064e3b;
+  --bg-card-hover: #0f766e;
+  --bg-elevated: #042f2e;
+  --divider: #115e59;
+  --primary: #10b981;
+  --primary-hover: #059669;
+  --primary-text: #ecfdf5;
+  --secondary-text: #34d399;
+  --primary-btn-text: #ffffff;
 }
 
-/* Elegant glowing scrollbar */
-::-webkit-scrollbar {
+[data-theme="sunset"] {
+  --bg-page: #1c0a00;
+  --bg-card: #2d1500;
+  --bg-card-hover: #452400;
+  --bg-elevated: #371b00;
+  --divider: #ea580c;
+  --primary: #f97316;
+  --primary-hover: #ea580c;
+  --primary-text: #fff7ed;
+  --secondary-text: #fb923c;
+  --primary-btn-text: #ffffff;
+}
+
+[data-theme="midnight"] {
+  --bg-page: #000000;
+  --bg-card: #0c0c0e;
+  --bg-card-hover: #1e1e24;
+  --bg-elevated: #151518;
+  --divider: #2d2d34;
+  --primary: #ffffff;
+  --primary-hover: #e4e4e7;
+  --primary-text: #f4f4f5;
+  --secondary-text: #a1a1aa;
+  --primary-btn-text: #000000;
+}
+
+.bg-primary {
+  color: var(--primary-btn-text, #ffffff) !important;
+}
+
+@layer base {
+  html, body {
+    background-color: var(--color-bg-page);
+    color: var(--color-primary-text);
+    font-family: var(--font-sans);
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(24, 24, 27, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+}
+
+.glass-dropdown {
+  background: rgba(15, 15, 18, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(63, 63, 70, 0.6);
+}
+
+/* Premium Scrollbars */
+.scrollbar-subtle::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(15, 15, 25, 0.4);
-  backdrop-filter: blur(10px);
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
-  border-radius: 99px;
-  transition: all 0.3s ease;
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  background: var(--color-divider);
+  border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(244, 63, 94, 0.6);
-  box-shadow: 0 0 10px rgba(244, 63, 94, 0.5);
+.scrollbar-subtle::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }
 
-/* Glowing Neon Utilities */
-.neon-glow-rose {
-  box-shadow: 0 0 20px rgba(var(--neon-rose), 0.15), 0 0 40px rgba(var(--neon-rose), 0.05);
-}
-
-.neon-glow-violet {
-  box-shadow: 0 0 20px rgba(var(--neon-violet), 0.15), 0 0 40px rgba(var(--neon-violet), 0.05);
-}
-
-.neon-glow-cyan {
-  box-shadow: 0 0 20px rgba(var(--neon-cyan), 0.15), 0 0 40px rgba(var(--neon-cyan), 0.05);
-}
-
-.neon-border-rose:hover {
-  border-color: rgba(var(--neon-rose), 0.6);
-  box-shadow: 0 0 15px rgba(var(--neon-rose), 0.25);
-}
-
-.neon-border-violet:hover {
-  border-color: rgba(var(--neon-violet), 0.6);
-  box-shadow: 0 0 15px rgba(var(--neon-violet), 0.25);
-}
-
-.neon-border-cyan:hover {
-  border-color: rgba(var(--neon-cyan), 0.6);
-  box-shadow: 0 0 15px rgba(var(--neon-cyan), 0.25);
-}
-
-/* Keyframes for soft typing animation */
-@keyframes typingPulse {
+/* Animations */
+@keyframes pulseGlow {
   0%, 100% {
-    transform: translateY(0);
-    opacity: 0.4;
+    opacity: 0.6;
+    transform: scale(1);
   }
   50% {
-    transform: translateY(-5px);
     opacity: 1;
+    transform: scale(1.02);
   }
 }
 
-.typing-dot {
-  animation: typingPulse 1.2s infinite ease-in-out;
+.animate-pulse-glow {
+  animation: pulseGlow 2s infinite ease-in-out;
 }
 
-.typing-dot:nth-child(2) {
-  animation-delay: 0.2s;
+@keyframes gradientX {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
-.typing-dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-/* Cyberpunk Mesh Grid Background */
-.cyber-bg {
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.07) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.08) 0px, transparent 50%),
-    radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
-}
-
-.cyber-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
-  background-size: 30px 30px;
+.animate-gradient-x {
+  animation: gradientX 6s ease infinite;
 }

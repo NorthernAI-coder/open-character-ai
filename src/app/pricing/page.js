@@ -1,187 +1,121 @@
 "use client";
 
-import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Check, Sparkles, Zap, ArrowLeft, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { FaCheck, FaInfoCircle } from "react-icons/fa";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
-export default function PricingPage() {
+const PLANS = [
+  { id: "basic", name: "Basic Pack", price: "$5", credits: 100, description: "Perfect for testing custom prompts and exploring styles." },
+  { id: "standard", name: "Standard Pack", price: "$10", credits: 250, description: "Ideal for regular creators wanting high resolution outputs." },
+  { id: "pro", name: "Professional Pack", price: "$20", credits: 600, description: "Designed for power users demanding batch exports and high speed.", popular: true },
+  { id: "business", name: "Business Pack", price: "$50", credits: 2000, description: "Maximum value pack for agency workflows and large volume generations." }
+];
+
+export default function Pricing() {
   const { data: session, status } = useSession();
-  const router = useRouter();
-  const [loadingTier, setLoadingTier] = useState(null);
+  const [loadingPlan, setLoadingPlan] = useState(null);
 
-  const handleCheckout = async (amount) => {
+  const handleCheckout = async (planId) => {
     if (status !== "authenticated") {
-      router.push("/api/auth/signin");
+      toast.error("You must sign in with Google to purchase credit packages.");
       return;
     }
 
+    setLoadingPlan(planId);
     try {
-      setLoadingTier(amount);
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ amount }),
-      });
-
-      const data = await res.json();
+      const { data } = await axios.post("/api/checkout", { planId });
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert(data.error || "Failed to initialize checkout session");
-        setLoadingTier(null);
+        throw new Error("No redirection URL returned");
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong");
-      setLoadingTier(null);
+      toast.error(err.response?.data?.error || "Failed to trigger Stripe checkout session.");
+    } finally {
+      setLoadingPlan(null);
     }
   };
 
-  const plans = [
-    {
-      name: "Starter Bundle",
-      amount: 1,
-      credits: 200,
-      description: "Perfect for quick sessions and casual chatting.",
-      icon: <Zap className="w-5 h-5 text-blue-400" />,
-      color: "from-blue-600/20 to-blue-900/20 border-blue-500/30",
-      buttonColor: "bg-blue-600 hover:bg-blue-500",
-      features: [
-        "200 Premium Credits",
-        "~100 Standard Messages",
-        "Zero queue waiting",
-        "Never expires",
-      ]
-    },
-    {
-      name: "Pro Pack",
-      amount: 5,
-      credits: 1000,
-      description: "Our most popular pack for daily power users.",
-      icon: <Sparkles className="w-5 h-5 text-amber-400" />,
-      color: "from-amber-600/20 to-amber-900/20 border-amber-500/50 scale-105 shadow-2xl shadow-amber-900/20",
-      buttonColor: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black shadow-lg shadow-amber-500/25",
-      isPopular: true,
-      features: [
-        "1000 Premium Credits",
-        "~500 Standard Messages",
-        "Zero queue waiting",
-        "Never expires",
-        "Priority LLM Routing"
-      ]
-    },
-    {
-      name: "Mega Bundle",
-      amount: 10,
-      credits: 2000,
-      description: "For heavy users building complex personas.",
-      icon: <Sparkles className="w-5 h-5 text-violet-400" />,
-      color: "from-violet-600/20 to-violet-900/20 border-violet-500/30",
-      buttonColor: "bg-violet-600 hover:bg-violet-500",
-      features: [
-        "2000 Premium Credits",
-        "~1000 Standard Messages",
-        "Zero queue waiting",
-        "Never expires",
-        "Highest Quality Models"
-      ]
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans relative overflow-hidden select-none">
-      
-      {/* Background aesthetics */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
+    <div className="flex min-h-dvh flex-col bg-bg-page select-none text-primary-text overflow-hidden">
+      <Toaster position="top-right" />
+      <Navbar />
 
-      {/* Header */}
-      <header className="px-6 py-6 border-b border-zinc-800/50 flex items-center justify-between relative z-10">
-        <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition group">
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-semibold text-sm">Back to Dashboard</span>
-        </Link>
-        <div className="font-black text-xl tracking-tight flex items-center gap-2">
-          (character.ai<span className="text-amber-500">+</span>)
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-16 relative z-10 flex flex-col items-center">
-        <div className="text-center mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700/50 text-xs font-bold text-zinc-300 uppercase tracking-widest mb-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            Pay as you go
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-12 sm:px-6 lg:px-8 flex flex-col gap-10 overflow-y-auto scrollbar-subtle items-center">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full mb-1">
+            <FaInfoCircle className="text-primary text-xs" />
+            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Pricing Plans</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white drop-shadow-sm">
-            Fuel your imagination.
-          </h1>
-          <p className="text-zinc-400 max-w-xl mx-auto font-medium text-sm md:text-base leading-relaxed">
-            Purchase premium credits to power your custom AI characters. No recurring subscriptions, no hidden fees. Just top up whenever you need more compute.
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight uppercase">Buy Credits Packs</h1>
+          <p className="text-xs sm:text-sm text-secondary-text max-w-lg leading-relaxed">
+            Purchase flexible credit packages to perform high-resolution predictions. Keep all profits — we handle AI infrastructure.
           </p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full items-center">
-          {plans.map((plan, idx) => (
-            <div 
-              key={idx}
-              className={`relative bg-gradient-to-br bg-[#121214] border rounded-2xl p-8 flex flex-col transition-all duration-300 hover:-translate-y-1 ${plan.color}`}
+        {/* Pricing Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl">
+          {PLANS.map((plan) => (
+            <div
+              key={plan.id}
+              className={`relative bg-bg-card border rounded-lg p-6 flex flex-col justify-between gap-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
+                plan.popular ? "border-primary shadow-xl shadow-primary/5 scale-105" : "border-divider/50 shadow-md"
+              }`}
             >
-              {plan.isPopular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+              {plan.popular && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider shadow">
                   Most Popular
-                </div>
+                </span>
               )}
-              
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-lg bg-zinc-950/50 shadow-inner">
-                  {plan.icon}
+
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-sm font-extrabold uppercase tracking-wide text-primary-text">{plan.name}</h3>
+                  <p className="text-2xl font-black tracking-tight text-white">{plan.price}</p>
                 </div>
-                <h3 className="font-bold text-lg text-zinc-100">{plan.name}</h3>
-              </div>
-              
-              <p className="text-xs text-zinc-400 font-medium mb-6 min-h-[32px]">{plan.description}</p>
-              
-              <div className="mb-6 flex items-baseline gap-1">
-                <span className="text-4xl font-black">${plan.amount}</span>
-                <span className="text-zinc-500 font-bold text-sm">USD</span>
-              </div>
-              
-              <div className="py-4 border-y border-zinc-800/50 mb-6 space-y-3">
-                {plan.features.map((feat, fidx) => (
-                  <div key={fidx} className="flex items-center gap-3 text-sm text-zinc-300 font-medium">
-                    <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{feat}</span>
-                  </div>
-                ))}
+                
+                <div className="text-xs bg-bg-page/50 border border-divider/30 p-3 rounded text-center font-extrabold text-primary">
+                  {plan.credits} Art Credits
+                </div>
+
+                <p className="text-xs text-secondary-text leading-relaxed font-medium min-h-[3rem]">{plan.description}</p>
+                
+                <ul className="space-y-2 border-t border-divider/30 pt-4 text-xs font-semibold text-secondary-text">
+                  <li className="flex items-center gap-2">
+                    <FaCheck className="text-primary text-[10px]" />
+                    <span>Dynamic aspect ratios</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FaCheck className="text-primary text-[10px]" />
+                    <span>HD image downloads</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FaCheck className="text-primary text-[10px]" />
+                    <span>No subscription required</span>
+                  </li>
+                </ul>
               </div>
 
               <button
-                onClick={() => handleCheckout(plan.amount)}
-                disabled={loadingTier !== null}
-                className={`mt-auto w-full py-3.5 rounded-xl font-bold transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 ${plan.buttonColor}`}
+                onClick={() => handleCheckout(plan.id)}
+                disabled={loadingPlan !== null}
+                className={`w-full py-3 rounded-full text-xs font-bold transition-all shadow-md cursor-pointer select-none active:scale-[0.98] ${
+                  plan.popular ? "bg-primary text-white hover:bg-primary-hover shadow-primary/15" : "bg-bg-page hover:bg-bg-card text-primary-text border border-divider"
+                }`}
               >
-                {loadingTier === plan.amount ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  <span>Buy {plan.credits} Credits</span>
-                )}
+                {loadingPlan === plan.id ? "Loading checkout..." : "Purchase Credits"}
               </button>
             </div>
           ))}
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
