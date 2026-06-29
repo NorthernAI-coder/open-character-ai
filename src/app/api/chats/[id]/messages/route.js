@@ -183,28 +183,34 @@ IMPORTANT:
       throw new Error("Did not receive a request_id from upstream server.");
     }
 
-    // 6. Synchronous server-side polling loop to retrieve results
+    // 6. Synchronous server-side polling loop to retrieve results (Infinite polling)
     let completedText = "";
     let status = "processing";
-    const maxTicks = 25; // max 37.5 seconds
     const tickDelay = 1500;
 
-    for (let tick = 0; tick < maxTicks; tick++) {
+    while (status === "processing") {
       await delay(tickDelay);
 
       const checkRes = await fetch(`https://api.muapi.ai/api/v1/predictions/${requestId}/result`, {
         method: "GET",
         headers: {
+          "Content-Type": "application/json",
           "x-api-key": apiKey,
         },
       });
 
       if (checkRes.ok) {
         const checkData = await checkRes.json();
-        status = checkData.status || "processing";
+        status = checkData.status || checkData.state || "processing";
 
-        if (status === "completed") {
-          completedText = checkData.outputs?.[0];
+        if (status === "completed" || status === "succeeded") {
+          completedText = checkData.outputs?.[0] || 
+                          (typeof checkData.output === "string" ? checkData.output : "") ||
+                          checkData.output?.text ||
+                          checkData.output?.choices?.[0]?.message?.content ||
+                          checkData.response ||
+                          "";
+          status = "completed"; // normalize
           break;
         } else if (status === "failed") {
           throw new Error("Generation task failed on the upstream serverless system.");
@@ -212,10 +218,6 @@ IMPORTANT:
       } else {
         console.warn(`[POLL_TICK_ERROR] Status code: ${checkRes.status}`);
       }
-    }
-
-    if (status !== "completed") {
-      throw new Error("Generation task timed out.");
     }
 
     // 7. Save and commit assistant response
